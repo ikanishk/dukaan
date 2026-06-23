@@ -1,0 +1,94 @@
+spring:
+  application:
+    name: dukaan-backend
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dukaan
+    username: dukaan
+    password: dukaan123
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+  
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+    default-property-inclusion: non_null
+  
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+  compression:
+    enabled: true
+
+# Application Configuration
+app:
+  jwt:
+    secret: dukaan-secret-key-change-this-in-production-minimum-256-bits-required-for-security
+    expiration: 86400000 # 24 hours
+  
+  sku:
+    prefix: S
+    start-number: 1
+  
+  barcode:
+    width: 300
+    height: 100
+    format: CODE_128
+  
+  upload:
+    directory: ./uploads
+  
+  reports:
+    directory: ./reports
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.dukaan: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/dukaan.log
+
+# Swagger/OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
