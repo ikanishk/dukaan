@@ -1,0 +1,607 @@
+================================================================================
+                    DUKAAN - COMPLETE SETUP GUIDE
+           Second-Hand Mobile Retail Management System
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. Prerequisites
+2. Setup on Current Laptop (Windows)
+3. Push to GitHub/GitLab
+4. Setup on New Laptop (Mac M5)
+5. Troubleshooting
+6. Quick Reference Commands
+
+================================================================================
+SECTION 1: PREREQUISITES
+================================================================================
+
+CURRENT LAPTOP (Windows):
+-------------------------
+✓ Java 11 - Already installed
+✓ Maven - Already installed
+✓ Node.js - Already installed
+✓ Git - Required
+
+NEW LAPTOP (Mac M5):
+--------------------
+□ Docker Desktop for Mac (Apple Silicon)
+□ Git
+□ (Optional) Java 11 + Maven + Node.js for development without Docker
+
+================================================================================
+SECTION 2: SETUP ON CURRENT LAPTOP (WINDOWS)
+================================================================================
+
+STEP 1: Verify Current Setup
+-----------------------------
+Your application is currently running:
+- Backend: http://localhost:8081 (Java process)
+- Frontend: http://localhost:3000 (Node process)
+- Database: H2 in-memory
+
+STEP 2: Stop Running Services
+------------------------------
+Open PowerShell and run:
+
+# Find and stop backend (port 8081)
+netstat -ano | findstr :8081
+taskkill /F /PID <PID_FROM_ABOVE>
+
+# Find and stop frontend (port 3000)
+netstat -ano | findstr :3000
+taskkill /F /PID <PID_FROM_ABOVE>
+
+STEP 3: Prepare for GitHub/GitLab
+----------------------------------
+Navigate to project directory:
+cd C:\Users\AL84861\Downloads\Dukaan
+
+Check what files exist:
+dir
+
+You should see:
+- backend/ folder
+- frontend/ folder
+- docker-compose.prod.yml
+- .gitlab-ci.yml
+- DOCKER_SETUP.md
+- README_GITHUB.md
+- .gitignore
+- .env.example
+
+================================================================================
+SECTION 3: PUSH TO GITHUB/GITLAB
+================================================================================
+
+STEP 1: Initialize Git Repository
+----------------------------------
+cd C:\Users\AL84861\Downloads\Dukaan
+
+# Initialize git (if not already done)
+git init
+
+# Check status
+git status
+
+STEP 2: Add All Files
+----------------------
+git add .
+
+# Verify what will be committed
+git status
+
+STEP 3: Commit Changes
+-----------------------
+git commit -m "Initial commit: Dukaan mobile retail management system with Docker and CI/CD"
+
+STEP 4: Create Repository on GitHub/GitLab
+-------------------------------------------
+Go to:
+- GitHub: https://github.com/new
+- GitLab: https://gitlab.com/projects/new
+
+Create a new repository named: dukaan
+Do NOT initialize with README (we already have files)
+
+STEP 5: Add Remote and Push
+----------------------------
+# For GitHub:
+git remote add origin https://github.com/YOUR_USERNAME/dukaan.git
+git branch -M main
+git push -u origin main
+
+# For GitLab:
+git remote add origin https://gitlab.com/YOUR_USERNAME/dukaan.git
+git branch -M main
+git push -u origin main
+
+Enter your credentials when prompted.
+
+STEP 6: Verify Upload
+----------------------
+Go to your GitHub/GitLab repository in browser and verify all files are there.
+
+================================================================================
+SECTION 4: SETUP ON NEW LAPTOP (MAC M5)
+================================================================================
+
+STEP 1: Install Docker Desktop
+-------------------------------
+1. Download Docker Desktop for Mac (Apple Silicon):
+   https://www.docker.com/products/docker-desktop
+
+2. Install the .dmg file
+
+3. Open Docker Desktop application
+
+4. Wait for Docker to start (whale icon in menu bar)
+
+5. Verify installation:
+   docker --version
+   docker-compose --version
+
+STEP 2: Install Git (if not installed)
+---------------------------------------
+# Check if git is installed
+git --version
+
+# If not installed:
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install git
+
+STEP 3: Clone Repository
+-------------------------
+# Open Terminal on Mac
+cd ~
+mkdir projects
+cd projects
+
+# Clone from GitHub:
+git clone https://github.com/YOUR_USERNAME/dukaan.git
+
+# Or from GitLab:
+git clone https://gitlab.com/YOUR_USERNAME/dukaan.git
+
+# Navigate to project
+cd dukaan
+
+STEP 4: Create Environment File
+--------------------------------
+# Copy example file
+cp .env.example .env
+
+# Edit the file
+nano .env
+
+Update these values:
+POSTGRES_PASSWORD=YourSecurePassword123!
+JWT_SECRET=your-super-secret-jwt-key-at-least-256-bits-long-random-string
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+
+Save: Ctrl+O, Enter
+Exit: Ctrl+X
+
+STEP 5: Start with Docker Compose
+----------------------------------
+# Make sure Docker Desktop is running
+# You should see the whale icon in menu bar
+
+# Start all services
+docker-compose -f docker-compose.prod.yml up -d
+
+# This will:
+# - Download PostgreSQL image
+# - Build backend Docker image
+# - Build frontend Docker image
+# - Start all three containers
+
+# Wait 30-60 seconds for everything to start
+
+STEP 6: Verify Services Are Running
+------------------------------------
+# Check container status
+docker-compose -f docker-compose.prod.yml ps
+
+You should see:
+NAME                STATUS
+dukaan-postgres     Up
+dukaan-backend      Up
+dukaan-frontend     Up
+
+# View logs
+docker-compose -f docker-compose.prod.yml logs -f
+
+Press Ctrl+C to stop viewing logs
+
+STEP 7: Access the Application
+-------------------------------
+Open browser and go to:
+http://localhost:3000
+
+Login with:
+Username: admin
+Password: admin123
+
+STEP 8: Test the Application
+-----------------------------
+1. You should see the Dashboard
+2. Click "Inventory" in sidebar
+3. Click "Add Device" button
+4. Fill in device details:
+   - IMEI: 123456789012345
+   - Brand: Apple
+   - Model: iPhone 13
+   - Color: Blue
+   - Storage: 128GB
+   - RAM: 4GB
+   - Purchase Price: 45000
+5. Click "Add Device"
+6. Device should appear in the list
+
+================================================================================
+SECTION 5: TROUBLESHOOTING
+================================================================================
+
+PROBLEM: "docker-compose: command not found"
+--------------------------------------------
+SOLUTION:
+# Check if Docker Desktop is running
+docker --version
+
+# If not installed, install Docker Desktop
+# Download from: https://www.docker.com/products/docker-desktop
+
+# Restart terminal after installation
+
+
+PROBLEM: "Cannot connect to Docker daemon"
+-------------------------------------------
+SOLUTION:
+1. Open Docker Desktop application
+2. Wait for it to fully start (whale icon in menu bar)
+3. Try command again
+
+
+PROBLEM: Port 3000 already in use
+----------------------------------
+SOLUTION:
+# Find process using port
+lsof -i :3000
+
+# Kill the process
+kill -9 <PID>
+
+# Or change port in docker-compose.prod.yml:
+# Change "3000:3000" to "3001:3000"
+
+
+PROBLEM: Port 8080 already in use
+----------------------------------
+SOLUTION:
+# Find process using port
+lsof -i :8080
+
+# Kill the process
+kill -9 <PID>
+
+# Or change port in docker-compose.prod.yml:
+# Change "8080:8080" to "8081:8080"
+
+
+PROBLEM: Frontend shows blank page
+-----------------------------------
+SOLUTION:
+# Check frontend logs
+docker-compose -f docker-compose.prod.yml logs frontend
+
+# Restart frontend
+docker-compose -f docker-compose.prod.yml restart frontend
+
+# If still not working, rebuild:
+docker-compose -f docker-compose.prod.yml up --build -d
+
+
+PROBLEM: Backend API not responding
+------------------------------------
+SOLUTION:
+# Check backend logs
+docker-compose -f docker-compose.prod.yml logs backend
+
+# Check if database is running
+docker-compose -f docker-compose.prod.yml logs postgres
+
+# Restart backend
+docker-compose -f docker-compose.prod.yml restart backend
+
+
+PROBLEM: Database connection error
+-----------------------------------
+SOLUTION:
+# Check PostgreSQL is running
+docker-compose -f docker-compose.prod.yml ps postgres
+
+# View PostgreSQL logs
+docker-compose -f docker-compose.prod.yml logs postgres
+
+# Restart PostgreSQL
+docker-compose -f docker-compose.prod.yml restart postgres
+
+# If still failing, recreate everything:
+docker-compose -f docker-compose.prod.yml down -v
+docker-compose -f docker-compose.prod.yml up -d
+
+
+PROBLEM: "Empty docker-compose file" error
+-------------------------------------------
+SOLUTION:
+This means docker-compose.prod.yml is missing or empty.
+
+# Check if file exists
+ls -la docker-compose.prod.yml
+
+# If missing, you need to pull it from repository:
+git pull origin main
+
+# Or download directly from GitHub/GitLab web interface
+
+
+PROBLEM: Can't access http://localhost:3000
+--------------------------------------------
+SOLUTION:
+# Check if containers are running
+docker-compose -f docker-compose.prod.yml ps
+
+# Check frontend logs
+docker-compose -f docker-compose.prod.yml logs frontend
+
+# Try accessing backend directly
+curl http://localhost:8080/actuator/health
+
+# If backend works but frontend doesn't:
+docker-compose -f docker-compose.prod.yml restart frontend
+
+# Clear browser cache and try again
+
+
+PROBLEM: "Login failed" or "Network error"
+-------------------------------------------
+SOLUTION:
+# Check if backend is accessible
+curl http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# If this fails, check backend logs:
+docker-compose -f docker-compose.prod.yml logs backend
+
+# Verify environment variables in .env file
+
+================================================================================
+SECTION 6: QUICK REFERENCE COMMANDS
+================================================================================
+
+DOCKER COMMANDS (Mac):
+----------------------
+# Start everything
+docker-compose -f docker-compose.prod.yml up -d
+
+# Stop everything
+docker-compose -f docker-compose.prod.yml down
+
+# View all logs
+docker-compose -f docker-compose.prod.yml logs -f
+
+# View specific service logs
+docker-compose -f docker-compose.prod.yml logs -f backend
+docker-compose -f docker-compose.prod.yml logs -f frontend
+docker-compose -f docker-compose.prod.yml logs -f postgres
+
+# Restart a service
+docker-compose -f docker-compose.prod.yml restart backend
+
+# Rebuild and restart
+docker-compose -f docker-compose.prod.yml up --build -d
+
+# Stop and remove everything (including database data)
+docker-compose -f docker-compose.prod.yml down -v
+
+# Check status
+docker-compose -f docker-compose.prod.yml ps
+
+# Execute command in container
+docker exec -it dukaan-backend bash
+docker exec -it dukaan-frontend sh
+docker exec -it dukaan-postgres psql -U dukaan -d dukaan
+
+
+GIT COMMANDS:
+-------------
+# Clone repository
+git clone https://github.com/YOUR_USERNAME/dukaan.git
+
+# Pull latest changes
+git pull origin main
+
+# Check status
+git status
+
+# Add changes
+git add .
+
+# Commit changes
+git commit -m "Your message"
+
+# Push changes
+git push origin main
+
+
+USEFUL CHECKS:
+--------------
+# Check if port is in use (Mac)
+lsof -i :3000
+lsof -i :8080
+
+# Kill process by PID
+kill -9 <PID>
+
+# Check Docker version
+docker --version
+docker-compose --version
+
+# Check running containers
+docker ps
+
+# Check all containers (including stopped)
+docker ps -a
+
+# View Docker resource usage
+docker stats
+
+# Clean up unused Docker resources
+docker system prune -a
+
+================================================================================
+SECTION 7: ALTERNATIVE SETUP (WITHOUT DOCKER)
+================================================================================
+
+If you don't want to use Docker, you can run manually:
+
+PREREQUISITES:
+--------------
+# Install Java 11
+brew install openjdk@11
+
+# Install Maven
+brew install maven
+
+# Install Node.js
+brew install node
+
+# Install PostgreSQL
+brew install postgresql@15
+brew services start postgresql@15
+
+
+BACKEND SETUP:
+--------------
+cd backend
+
+# Build
+mvn clean package -DskipTests
+
+# Run with H2 (in-memory database)
+java -jar target/dukaan-backend-1.0.0.jar \
+  --spring.profiles.active=h2 \
+  --server.port=8081
+
+# Backend runs on: http://localhost:8081
+
+
+FRONTEND SETUP:
+---------------
+# Open new terminal
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Frontend runs on: http://localhost:3000
+
+================================================================================
+SECTION 8: ACCESSING THE APPLICATION
+================================================================================
+
+URLS:
+-----
+Frontend:        http://localhost:3000
+Backend API:     http://localhost:8080/api
+H2 Console:      http://localhost:8081/h2-console (dev mode only)
+PostgreSQL:      localhost:5432 (Docker mode)
+
+DEFAULT CREDENTIALS:
+--------------------
+Admin User:
+  Username: admin
+  Password: admin123
+
+Staff User:
+  Username: staff
+  Password: staff123
+
+Database (Docker):
+  Database: dukaan
+  Username: dukaan
+  Password: (from your .env file)
+
+================================================================================
+SECTION 9: FEATURES TO TEST
+================================================================================
+
+1. DASHBOARD
+   - View business metrics
+   - See inventory stats
+   - Check sales summary
+
+2. INVENTORY
+   - Add new device
+   - Search devices
+   - View device details
+   - Check device status
+
+3. SALES
+   - View sales transactions
+   - Search by invoice
+   - Check revenue and profit
+
+4. RETURNS
+   - View returns
+   - Check return status
+   - Track refunds
+
+5. CUSTOMERS
+   - View customer list
+   - Search customers
+   - Check outstanding balances
+
+6. REPORTS
+   - View report cards
+   - Generate reports
+
+================================================================================
+SECTION 10: IMPORTANT FILES
+================================================================================
+
+docker-compose.prod.yml    - Docker configuration for all services
+.env                       - Environment variables (create from .env.example)
+.env.example              - Example environment file
+backend/Dockerfile        - Backend Docker build instructions
+frontend/Dockerfile       - Frontend Docker build instructions
+.gitlab-ci.yml           - GitLab CI/CD pipeline configuration
+DOCKER_SETUP.md          - Detailed Docker documentation
+README_GITHUB.md         - Project README for GitHub
+
+================================================================================
+SECTION 11: SUPPORT & DOCUMENTATION
+================================================================================
+
+For more detailed information, see:
+- DOCKER_SETUP.md - Complete Docker and CI/CD guide
+- README_GITHUB.md - Project overview and API documentation
+- PROJECT_STATUS.md - Current project status
+- ALL_FEATURES_COMPLETE.md - List of implemented features
+
+================================================================================
+END OF GUIDE
+================================================================================
+
+Last Updated: June 24, 2026
+Version: 1.0
+
+For issues or questions, check the troubleshooting section above or review
+the logs using: docker-compose -f docker-compose.prod.yml logs -f
+
+Good luck with your deployment! 🚀
