@@ -1,31 +1,34 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: dukaan-postgres
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dukaan-backend
     environment:
-      POSTGRES_DB: dukaan
-      POSTGRES_USER: dukaan
-      POSTGRES_PASSWORD: dukaan123
-      PGDATA: /var/lib/postgresql/data/pgdata
+      SPRING_PROFILES_ACTIVE: h2
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dukaan"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
+      - "8080:8080"
     networks:
       - dukaan-network
+    restart: unless-stopped
 
-volumes:
-  postgres_data:
-    driver: local
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dukaan-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080/api
+      NEXT_PUBLIC_APP_NAME: Dukaan
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - dukaan-network
+    restart: unless-stopped
 
 networks:
   dukaan-network:
